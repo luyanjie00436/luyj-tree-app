@@ -15,6 +15,15 @@
             }
             
         }
+        ,{
+            "path" : "pages/search-test/luyj-search-test",
+            "style" :                                                                                    
+            {
+                "navigationBarTitleText": "输入框",
+                "enablePullDownRefresh": false
+            }
+            
+        }
     ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -28,6 +37,11 @@
 			{
 				"name": "首页", //模式名称
 				"path": "pages/index/index", //启动页面，必选
+				"query": "" //启动参数，在页面的onLoad函数里面得到
+			},
+			{
+				"name": "测试-搜索", //模式名称
+				"path": "pages/search-test/luyj-search-test", //启动页面，必选
 				"query": "" //启动参数，在页面的onLoad函数里面得到
 			}			
 		]

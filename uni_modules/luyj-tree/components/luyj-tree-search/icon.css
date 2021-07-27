@@ -13,6 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* 清除图标 */
+.icon-clear:before{
+	content: '\e606';
+}
+
 .icon-banxuanzhongshousuo1-shi:before {
   content: "\e682";
 }
@@ -36,7 +41,6 @@
 .icon-xuanzhong1:before {
   content: "\e62d";
 }
-
 .icon-xuanzhong2:before {
   content: "\e656";
 }

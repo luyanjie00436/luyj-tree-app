@@ -2,7 +2,9 @@
 	<view>
 		<!-- 搜索框 -->
 		<view class="header">
-			<luyj-tree-search v-if="searchIf" ref="sea" @confirm="confirmSearch" />
+			<luyj-tree-search v-if="searchIf" ref="sea" 
+			:backgroundColor="searchBackgroundColor" :inputBackgroundColor="searchInputBackgroundColor" :radius="searchRadius" :iconColor="searchIconColor" :placeholder="searchPlaceholder" :placeholderStyle="searchPlaceholderStyle" :maxlength="searchMaxlength" :clearable="searchClearable"
+			@confirm="confirmSearch" />
 			<view class="title">
 				<scroll-view scroll-x style="width: 100%;white-space: nowrap;" :scroll-left="scrollLeft">
 					<view v-for="(item,index) in tree_stack" class="inline-item" :key="index">
@@ -50,16 +52,18 @@
 							<i v-if="newCheckList.length>0&&item.id == newCheckList[0].id" class="txt iconfont icon-selected"/>
 							<i style="color: #b8b8b8;" v-else class="txt iconfont icon-weixuanzhong1"/>
 						</view>
-						<view v-if="item.user" @click.stop="checkboxChange(item,index,item.bx,item.qx)"><slot v-bind:item="item"></slot></view>
-						<slot v-else v-bind:item="item">
-						</slot>
+						<!-- body slot -->
+						<view v-if="item.user" @click.stop="checkboxChange(item,index,item.bx,item.qx)">
+							<slot v-bind:item="item" name="body"></slot>
+						</view>
+						<slot v-else v-bind:item="item" name="body"></slot>
 						<view class="right"><i v-if="!item.user&&item.children.length>0" class="iconfont icon-z043"></i></view>
 					</label>
 				</view>
 			</view>
 		</view>
 		<!-- 确定按钮 -->
-		<view class="btn box_sizing">
+		<view v-if="isCheck" class="btn box_sizing">
 			<button class="sureBtn" type="primary" @click="backConfirm">确认</button>
 		</view>
 	</view>
@@ -67,12 +71,20 @@
 
 <script>
 	/**
-	 * luyj-tree 无限树形结构组支持搜索选择。
+	 * luyj-tree 无限树形结构树、支持搜索选择。
 	 * @description  无限树形结构组件。支持搜索、选择(包括单选、多选)。面包屑类型导航。原插件地址：https://ext.dcloud.net.cn/plugin?id=2423。
-	 * @tutorial url 
+	 * @tutorial url https://ext.dcloud.net.cn/plugin?name=luyj-tree
+	 * @property {Boolean} searchIf 是否开启搜索 （默认值true）
+	 * @property {String} searchBackgroundColor 搜索框背景色(默认#FFFFFF)
+	 * @property {String} searchInputBackgroundColor 搜索框的输入框背景色(默认#EEEFF0)
+	 * @property {Number} searchRadius 搜索框的圆角值，单位rpx（默认40）
+	 * @property {String} searchPlaceholder 搜索框的内容物空时提示内容
+	 * @property {String} searchPlaceholderStyle 搜索框的placehoder的样式
+	 * @property {Number} searchMaxlength 搜索框的最大输入长度 ,设置为 -1 的时候不限制最大长度
+	 * @property {String} searchIconColor 搜索框的图标颜色（默认#B8B8B8）
+	 * @property {Boolean} searchPlaceholder 搜索框是否显示清除按钮
 	 * @property {Array}  trees 传入的树形结构，每个对象必须包含唯一的id值(默认值【】)
 	 * @property {Boolean} isCheck 是否开启选择操作（默认值false）
-	 * @property {Boolean} searchIf 是否开启搜索 （默认值true）
 	 * @property {Number} max 最大的level层数（默认值-1）
 	 * @property {Array} checkList 选中列表
 	 * @property {Boolean} parent 当子级全选时,是否选中父级数据(prop.checkStrictly为true时生效)(默认值false)
@@ -88,6 +100,51 @@
 	export default {
 		name: "luyj-tree",
 		props: {
+			// 是否开启搜索
+			searchIf: {
+				type: Boolean,
+				default: () => true
+			},
+			// 搜索框背景色
+			searchBackgroundColor: {
+				type: String,
+				default: '#FFFFFF'
+			},
+			// 搜索框的输入框内背景颜色
+			searchInputBackgroundColor: {
+				type: String,
+				default: '#EEEFF0'
+			},
+			// 搜索框的图标的颜色
+			searchIconColor: {
+				type: String,
+				default: '#B8B8B8'
+			},
+			// 搜索框的圆角值，单位rpx
+			searchRadius :{
+				type: Number,
+				default: 40
+			},
+			// 搜索框的提示placeholder内容
+			searchPlaceholder: {
+				type: String,
+				default: '搜索'
+			},
+			// 搜索框的placeholder的样式
+			searchPlaceholderStyle: {
+				type : String,
+				default:''
+			},
+			// 搜索框最大输入长度 ,设置为 -1 的时候不限制最大长度
+			searchMaxlength :{
+				type:Number,
+				type:140
+			},
+			// 搜索框是否显示清除按钮
+			searchClearable :{
+				type: Boolean,
+				default:true
+			},
 			// 传入的树形结构数据，每个对象必须包含唯一的id值
 			trees: {
 				type: Array,
@@ -102,11 +159,7 @@
 					return false
 				}
 			},
-			// 是否开启搜索
-			searchIf: {
-				type: Boolean,
-				default: () => true
-			},
+			
 			// 最大level层数
 			max: {
 				type: Number,
@@ -305,8 +358,11 @@
 				if (this.props.checkStrictly) this.checkAllChoose();
 				this.$forceUpdate()
 			},
-			//搜索
-			confirmSearch(val) {
+			/** 搜索时方法
+			 * @param {Object} e
+			 */
+			confirmSearch(e) {
+				var val = e.detail.value;
 				this.searchResult = []
 				this.search(this.allData, val)
 				this.isre = true

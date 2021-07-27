@@ -1,12 +1,12 @@
 {
   "id": "luyj-tree",
-  "displayName": "luyj-tree",
-  "version": "1.0.0",
-  "description": "luyj-tree",
+  "displayName": "luyj-tree 无限级树形结构。",
+  "version": "1.1.0",
+  "description": "无限极树形结构。支持搜索、面包屑导航、单项选择、多项选择。",
   "keywords": [
     "luyj-tree"
 ],
-  "repository": "",
+  "repository": "https://github.com/luyanjie00436/luyj-tree-app",
   "engines": {
     "HBuilderX": "^3.1.0"
   },
@@ -27,9 +27,9 @@
       "qq": ""
     },
     "declaration": {
-      "ads": "",
-      "data": "",
-      "permissions": ""
+      "ads": "无",
+      "data": "无",
+      "permissions": "无"
     },
     "npmurl": ""
   },
@@ -38,8 +38,8 @@
     "encrypt": [],
     "platforms": {
       "cloud": {
-        "tcb": "u",
-        "aliyun": "u"
+        "tcb": "y",
+        "aliyun": "y"
       },
       "client": {
         "App": {
@@ -56,15 +56,17 @@
           "Chrome": "y",
           "IE": "u",
           "Edge": "u",
-          "Firefox": "u",
+          "Firefox": "y",
           "Safari": "u"
         },
         "小程序": {
-          "微信": "y",
+          "微信": {
+            "minVersion": "2.18.1"
+        },
           "阿里": "u",
           "百度": "u",
           "字节跳动": "u",
-          "QQ": "y"
+          "QQ": "u"
         },
         "快应用": {
           "华为": "u",
