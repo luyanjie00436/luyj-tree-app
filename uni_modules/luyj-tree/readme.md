@@ -88,7 +88,9 @@ nodes			|Boolean	|true		|	在单选模式下，nodes为false时，可以选择�
 
 ### 说明
 
-``luyj-tree-search`` 是 ``luyj-tree-search``内的组件，可以单独引用。
+``luyj-tree-search`` 是 ``luyj-tree``内的组件，可以单独引用。
+
+![Image text](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-c07243ab-98a3-4f90-9b4d-2fa60aba2ee9/ba6ace1d-4881-4373-8a8e-b90079d3e290.png)
 
 ### 基本用法
 ### 
@@ -120,3 +122,7 @@ maxlength				|Number		|140		|	最大输入长度 ,设置为 -1 的时候不限�
 @confirm		|输入框内容提交时，触发事件	| event
 @clear			|清空输入框内容时，触发事件	| ''
 
+### 源码地址
+
+[代码csdn地址](https://codechina.csdn.net/qq_28624235/luyj-tree-app) <br>
+[代码github地址](https://github.com/luyanjie00436/luyj-tree-app)

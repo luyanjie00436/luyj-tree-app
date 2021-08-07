@@ -4,7 +4,7 @@
 		<view class="header">
 			<luyj-tree-search v-if="searchIf" ref="sea" 
 			:backgroundColor="searchBackgroundColor" :inputBackgroundColor="searchInputBackgroundColor" :radius="searchRadius" :iconColor="searchIconColor" :placeholder="searchPlaceholder" :placeholderStyle="searchPlaceholderStyle" :maxlength="searchMaxlength" :clearable="searchClearable"
-			@confirm="confirmSearch" />
+			@confirm="confirmSearch"> </luyj-tree-search>
 			<view class="title">
 				<scroll-view scroll-x style="width: 100%;white-space: nowrap;" :scroll-left="scrollLeft">
 					<view v-for="(item,index) in tree_stack" class="inline-item" :key="index">
@@ -54,9 +54,13 @@
 						</view>
 						<!-- body slot -->
 						<view v-if="item.user" @click.stop="checkboxChange(item,index,item.bx,item.qx)">
-							<slot v-bind:item="item" name="body"></slot>
+							<slot v-bind:item="item" >
+								{{ item.name }}
+							</slot>
 						</view>
-						<slot v-else v-bind:item="item" name="body"></slot>
+						<slot v-else v-bind:item="item" >
+							{{ item.name }}
+						</slot>
 						<view class="right"><i v-if="!item.user&&item.children.length>0" class="iconfont icon-z043"></i></view>
 					</label>
 				</view>
@@ -138,7 +142,7 @@
 			// 搜索框最大输入长度 ,设置为 -1 的时候不限制最大长度
 			searchMaxlength :{
 				type:Number,
-				type:140
+				default:140
 			},
 			// 搜索框是否显示清除按钮
 			searchClearable :{

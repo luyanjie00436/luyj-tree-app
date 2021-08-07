@@ -1,20 +1,19 @@
 <template>
 	<view>
 		<view class='filterBox' :style="{'background-color' : backgroundColor}">
-			<view class='filter-input' :style="{'background-color' :inputBackgroundColor ,'border-radius':radius + 'rpx'}">
+			<view class='filter-input'
+				:style="{'background-color' :inputBackgroundColor ,'border-radius':radius + 'rpx'}">
 				<!-- 左侧搜索图标 -->
 				<text :style="{'color':iconColor}" class="iconfont icon-sousuo filterImg"></text>
 				<!-- 输入框内容 -->
-				<input  class="text" type='text' v-model="inputVal" confirm-type="搜索" 
-					:placeholder='placeholder' :placeholder-style="placeholderStyle"
-					:maxlength="maxlength"
-					@input="handleInput" @focus="handleFocus" @blur="handleBlur" @confirm='handleFllter' ></input>
+				<input class="text" type='text' v-model="inputVal" confirm-type="搜索" :placeholder='placeholder'
+					:placeholder-style="placeholderStyle" :maxlength="maxlength" @input="handleInput"
+					@focus="handleFocus" @blur="handleBlur" @confirm='handleFllter'></input>
 				<!-- 清除按钮 -->
 				<view v-if="clearable" class="padding-left-sm" @click="clears">
 					<text :style="{'color':iconColor}" class="iconfont icon-clear filterImg"></text>
 				</view>
 			</view>
-
 		</view>
 	</view>
 </template>
@@ -51,9 +50,9 @@
 				default: '#EEEFF0'
 			},
 			// 输入框圆角
-			radius :{
-				type:Number,
-				default:40
+			radius: {
+				type: Number,
+				default: 40
 			},
 			// 输入框为空时占位符
 			placeholder: {
@@ -62,13 +61,13 @@
 			},
 			// placeholder的样式
 			placeholderStyle: {
-				type : String,
-				default:''
+				type: String,
+				default: ''
 			},
 			// 最大输入长度 ,设置为 -1 的时候不限制最大长度
-			maxlength :{
-				type:Number,
-				type:140
+			maxlength: {
+				type: Number,
+				default: 140
 			},
 			// 图标的颜色
 			iconColor: {
@@ -76,15 +75,23 @@
 				default: '#B8B8B8'
 			},
 			// 是否显示清除按钮
-			clearable :{
+			clearable: {
 				type: Boolean,
-				default:true
+				default: true
 			}
 		},
 		data() {
 			return {
 				inputVal: "", // 输入内容
 			};
+		},
+		components: {
+			test: function() {
+				return 120;
+			}
+		},
+		created: function() {
+			console.log(typeof(this.maxlength), typeof(140));
 		},
 		methods: {
 			/** 输入框变化时方法
@@ -116,7 +123,7 @@
 			 */
 			clears: function() {
 				this.inputVal = "";
-				this.$emit("clear" , this.inputVal)
+				this.$emit("clear", this.inputVal)
 			}
 		},
 	}
@@ -151,8 +158,9 @@
 			}
 		}
 	}
-	 // 添加左侧padding(用于扩大图标范围)
-	 .padding-left-sm{
+
+	// 添加左侧padding(用于扩大图标范围)
+	.padding-left-sm {
 		padding-left: 20rpx;
 	}
 

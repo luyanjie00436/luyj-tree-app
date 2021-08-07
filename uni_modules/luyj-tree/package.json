@@ -1,10 +1,14 @@
 {
   "id": "luyj-tree",
   "displayName": "luyj-tree 无限级树形结构。",
-  "version": "1.1.0",
+  "version": "1.1.6",
   "description": "无限极树形结构。支持搜索、面包屑导航、单项选择、多项选择。",
   "keywords": [
-    "luyj-tree"
+    "uni-ui",
+    "uniui",
+    "",
+    "tree",
+    ""
 ],
   "repository": "https://github.com/luyanjie00436/luyj-tree-app",
   "engines": {

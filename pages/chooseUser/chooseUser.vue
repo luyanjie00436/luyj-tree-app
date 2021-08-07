@@ -1,18 +1,12 @@
 <template>
 	<view>
-		<luyj-tree-search></luyj-tree-search>
 		<luyj-tree  v-slot:default="{item}" :checkList="checkList"  v-if="tree.length>0" :max="max" :props="prop" @sendValue="confirm"  :parent="true" :isCheck="isCheck" :trees="tree">
 			<!-- 内容插槽 -->
-			<!-- <view>
+			<view>
 				<view class="content-item">
 					<view class="word">{{item.name}}</view>
 				</view>
-			</view> -->
-			<template slot="body">
-				<view class="content-item">
-					<view class="word">{{item.name}}</view>
-				</view>
-			</template>
+			</view>
 		</luyj-tree>
 	</view>
 </template>
