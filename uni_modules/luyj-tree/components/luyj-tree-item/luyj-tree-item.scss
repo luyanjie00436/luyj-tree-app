@@ -1,0 +1,30 @@
+.container-list-item {
+	background-color: #fff;
+	border-bottom: 1rpx solid #f4f4f4;
+	padding-left: 10rpx;
+	.content {
+		display: flex;
+		align-items: center;
+		min-height: 60rpx;
+		width: 100%;
+		padding: 15rpx 0;
+		position: relative;
+		font-size: 32rpx;
+		// 默认文本显示内容（默认的slot）
+		.word {
+			margin-left: 16rpx;
+			font-size: 30rpx;
+			color: #5b5757;
+			width: 500rpx;
+			word-break: break-all;
+		}
+		// 默认右键显示内容
+		.right {
+			position: absolute;
+			right: 30rpx;
+			color: #babdc3;
+			font-size: 32rpx;
+		}
+		
+	}
+}

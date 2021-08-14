@@ -1,3 +1,18 @@
+// let dataList = [{
+// 	id: "128334455556667681",
+// 	name: "学生2104",
+// 	user: false,
+// 	children: [
+// 		{
+// 			id: "128334455556667682",
+// 			name: "学生2104",
+// 			user: true,
+// 			children:[]
+// 		}
+// 	],
+// 	checked: false
+// }];
+// export default dataList
 let dataList = [{
 		checked: false,
 		children: [{
@@ -569,7 +584,6 @@ let dataList = [{
 						checked: false,
 						user: true
 					},
-
 					{
 						children: [],
 						id: "128177866566666375907655681",
@@ -608,7 +622,6 @@ let dataList = [{
 				pid: "4",
 				user: false
 			}
-
 		]
 	},
 	{
@@ -878,7 +891,6 @@ let dataList = [{
 						checked: false,
 						user: true
 					},
-
 					{
 						children: [],
 						id: "12818798999778375907655681",
@@ -1197,7 +1209,5 @@ let dataList = [{
 			user: true
 		}]
 	},
-
-]
-
+];
 export default dataList

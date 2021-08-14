@@ -2,9 +2,11 @@
 	<view>
 		<!-- 搜索框 -->
 		<view class="header">
+			<!-- 搜索栏 -->
 			<luyj-tree-search v-if="searchIf" ref="sea" 
 			:backgroundColor="searchBackgroundColor" :inputBackgroundColor="searchInputBackgroundColor" :radius="searchRadius" :iconColor="searchIconColor" :placeholder="searchPlaceholder" :placeholderStyle="searchPlaceholderStyle" :maxlength="searchMaxlength" :clearable="searchClearable"
 			@confirm="confirmSearch"> </luyj-tree-search>
+			<!-- 面包屑导航 -->
 			<view class="title">
 				<scroll-view scroll-x style="width: 100%;white-space: nowrap;" :scroll-left="scrollLeft">
 					<view v-for="(item,index) in tree_stack" class="inline-item" :key="index">
@@ -33,6 +35,7 @@
 		<!-- 列表 -->
 		<view>
 			<view class="container-list">
+				<!-- <luyj-tree-item v-for="(item , index) in tree" :item="item" :key="index"></luyj-tree-item> -->
 				<view class="common" v-for="(item, index) in tree" @click="toChildren(item)" :key="index">
 					<label class="content">
 						<view class="checkbox" v-if="isCheck&&props.multiple" @click.stop="checkboxChange(item,index,item.bx,item.qx)">
@@ -52,7 +55,6 @@
 							<i v-if="newCheckList.length>0&&item.id == newCheckList[0].id" class="txt iconfont icon-selected"/>
 							<i style="color: #b8b8b8;" v-else class="txt iconfont icon-weixuanzhong1"/>
 						</view>
-						<!-- body slot -->
 						<view v-if="item.user" @click.stop="checkboxChange(item,index,item.bx,item.qx)">
 							<slot v-bind:item="item" >
 								{{ item.name }}
@@ -293,16 +295,6 @@
 					}
 				})
 			},
-			//取消父级
-			// deleteParent(id){
-			// 	for(var i = 0; i<this.parent_data.length;i++){
-			// 		if(id == this.parent_data[i].id) {
-			// 			this.parent_data.splice(i,1)
-			// 			break;
-			// 		}
-			// 	}
-			// },
-
 			// 关联下一级,选中
 			chooseChild(arr, pid) {
 				let that = this;
