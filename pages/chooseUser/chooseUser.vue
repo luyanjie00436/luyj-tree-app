@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<luyj-tree  v-slot:default="{item}" :checkList="checkList"  v-if="tree.length>0" :max="max" :props="prop" @sendValue="confirm"  :parent="true" :isCheck="isCheck" :trees="tree">
+		<luyj-tree  v-slot:default="{item}" :checkList="checkList"  :max="max" :props="prop" @sendValue="confirm"  :parent="true" :isCheck="isCheck" :trees="tree">
 			<!-- 内容插槽 -->
 			<view>
 				<view class="content-item">
@@ -12,12 +12,14 @@
 </template>
 
 <script>
-	import dataList from '@/common/data.js'; // 引用数据
+	import dataList from '@/common/data2.js'; // 引用数据
+	
+	var _self = this;
 	export default {
 		data() {
 			return {
 				title: '', // 标题名称
-				tree: dataList,
+				tree: null,
 				checkList: [],
 				backList: this.checkList,
 				max: 5,
@@ -52,6 +54,7 @@
 			}
 		},
 		onLoad(option) {
+			_self = this;
 			this.getParams(option);
 		},
 		methods: {
@@ -91,11 +94,26 @@
 				} else {
 					this.prop = this.dprop; //单选user
 				}
-				this.tree = dataList; //树形数据赋值
+				this.getTree(); 		// 获取树的数据
 				this.isCheck = option.isCheck != 'false' ? Boolean(option.isCheck) : false;
 			},
+			/** 获取树形图的数据
+			 * 模拟实际获取数据，设定时间为3s
+			 */
+			getTree : function(){
+				uni.showLoading({
+					title:'数据获取中……'
+				});
+				setTimeout(function(){
+					uni.hideLoading();
+					_self.tree = dataList;
+				},3000);
+			},
 			// =================================== 监听事件  =====================================================================
-			//获取选中的值
+			/** 获取选中的值
+			 * @param {Object} val
+			 * @param {Object} back
+			 */
 			confirm(val, back) {
 				// this.checkList = val;
 				if (back) {

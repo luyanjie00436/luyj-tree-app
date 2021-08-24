@@ -1,5 +1,5 @@
 # luyj-tree
-> 代码块 `luyj-tree` 、`luyj-search`
+> 代码块 `luyj-tree` 、`luyj-tree-search`、`luyj-tree-navigation`、`luyj-tree-item`
 
 ## 说明
 
@@ -16,7 +16,7 @@
 
 ```html
 <!-- 基础用法 -->
-<luyj-tree v-if="tree.length > 0" v-slot:default="{item}" :max="max" :trees="tree">
+<luyj-tree v-slot:default="{item}" :max="max" :trees="tree">
 	<!-- 内容插槽 -->
 	<view>
 		<view class="content-item">
@@ -50,24 +50,24 @@ export default {
 
 ### 属性
 
-属性名						|类型		|默认值		|	说明																									
-:-:							|:-:		|:-:		|	:-:	
-searchIf					|Boolean	|true		|	是否开启搜索
-searchBackgroundColor		|String		|#FFFFFF	|	搜索框背景色
-searchInputBackgroundColor	|String		|#EEEFF0	|	搜索框的输入框背景色
-searchRadius				|Number		|40			|	搜索框的圆角值，单位rpx（默认40）
-searchPlaceholder			|String		|搜索		|	搜索框的内容物空时提示内容
-searchPlaceholderStyle		|String		|			|	搜索框的placehoder的样式
-searchMaxlength				|Number		|140		|	搜索框的最大输入长度 ,设置为 -1 的时候不限制最大长度
-searchIconColor				|String		|			|	搜索框的图标颜色
-searchPlaceholder			|Boolean	|true		|	搜索框是否显示清除按钮
-trees						|Array		|[]			|	trees 传入的树形结构，每个对象必须包含唯一的id值
-isCheck						|Boolean	|false		|	是否开启选择操作
-max							|Number		|-1			|	最大的level层数
-checkList					|Array		|[]			|	选中的列表
-parent						|Boolean	|false		|	当子级全选时,是否选中父级数据(prop.checkStrictly为true时生效)
-parentList					|Array		|[]			|	父级列表
-props						|Object		|{label:'name',children:'children'}	|	参数配置，详细见下表
+|属性名						|类型		|默认值		|	说明																									
+|:-:						|:-:		|:-:		|	:-:	
+|searchIf					|Boolean	|true		|	是否开启搜索
+|searchBackgroundColor		|String		|#FFFFFF	|	搜索框背景色
+|searchInputBackgroundColor	|String		|#EEEFF0	|	搜索框的输入框背景色
+|searchRadius				|Number		|40			|	搜索框的圆角值，单位rpx（默认40）
+|searchPlaceholder			|String		|搜索		|	搜索框的内容物空时提示内容
+|searchPlaceholderStyle		|String		|			|	搜索框的placehoder的样式
+|searchMaxlength			|Number		|140		|	搜索框的最大输入长度 ,设置为 -1 的时候不限制最大长度
+|searchIconColor			|String		|			|	搜索框的图标颜色
+|searchPlaceholder			|Boolean	|true		|	搜索框是否显示清除按钮
+|trees						|Array		|[]			|	trees 传入的树形结构，每个对象必须包含唯一的id值
+|isCheck					|Boolean	|false		|	是否开启选择操作
+|max						|Number		|-1			|	最大的level层数
+|checkList					|Array		|[]			|	选中的列表
+|parent						|Boolean	|false		|	当子级全选时,是否选中父级数据(prop.checkStrictly为true时生效)
+|parentList					|Array		|[]			|	父级列表
+|props						|Object		|{label:'name',children:'children'}	|	参数配置，详细见下表
 
 #### props 参数说明
 参数				|类型		|默认值		|	说明																									
@@ -80,15 +80,15 @@ nodes			|Boolean	|true		|	在单选模式下，nodes为false时，可以选择�
 
 ### 事件
 
-事件名			|说明		|返回值																								
-:-:				|:-:		|:-:
-@selectitem		|点击项目触发的事件	|参数（索引，具体项目）
+事件名			|说明			|类型	|返回值																								
+:-:				|:-:			|:-:	|:-:
+@sendValue		|选中项触发事件	|Array	|参数（选中的项值）
 
 # luyj-tree-search
 
 ### 说明
 
-``luyj-tree-search`` 是 ``luyj-tree``内的组件，可以单独引用。
+``luyj-tree-search`` 是 ``luyj-tree``内的组件,作为搜索框,可以单独引用。
 
 ![Image text](https://vkceyugu.cdn.bspapp.com/VKCEYUGU-c07243ab-98a3-4f90-9b4d-2fa60aba2ee9/ba6ace1d-4881-4373-8a8e-b90079d3e290.png)
 
@@ -121,6 +121,22 @@ maxlength				|Number		|140		|	最大输入长度 ,设置为 -1 的时候不限�
 @blur			|输入框失去焦点时，触发事件	| event
 @confirm		|输入框内容提交时，触发事件	| event
 @clear			|清空输入框内容时，触发事件	| ''
+
+# luyj-tree-navigation
+
+``luyj-tree-navigation`` 是 ``luyj-tree``内的组件,作为面包屑导航栏，可以单独引用。
+
+# luyj-tree-item 
+
+``luyj-tree-item`` 是 ``luyj-tree``内的组件，是树的选择项。包含单选、多选的样式，可以单独引用。
+
+### 基础用法
+### 属性
+
+|属性名					|类型		|默认值		|	说明																									
+|:-:					|:-:		|:-:		|	:-:	
+
+### 事件
 
 ### 源码地址
 

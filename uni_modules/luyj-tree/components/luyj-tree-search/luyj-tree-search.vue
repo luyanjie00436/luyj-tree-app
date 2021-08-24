@@ -90,9 +90,6 @@
 				return 120;
 			}
 		},
-		created: function() {
-			console.log(typeof(this.maxlength), typeof(140));
-		},
 		methods: {
 			/** 输入框变化时方法
 			 * @param {Object} e

@@ -71,6 +71,14 @@
 				}
 			}
 		}
+		// item的数字样式
+		.word {
+			margin-left: 16rpx;
+			font-size: 30rpx;
+			color: #5b5757;
+			width: 500rpx;
+			word-break: break-all;
+		}
 	}
 	.active {
 		color: #4297ED !important;

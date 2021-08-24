@@ -3,69 +3,28 @@
 		<!-- 搜索框 -->
 		<view class="header">
 			<!-- 搜索栏 -->
-			<luyj-tree-search v-if="searchIf" ref="sea" 
-			:backgroundColor="searchBackgroundColor" :inputBackgroundColor="searchInputBackgroundColor" :radius="searchRadius" :iconColor="searchIconColor" :placeholder="searchPlaceholder" :placeholderStyle="searchPlaceholderStyle" :maxlength="searchMaxlength" :clearable="searchClearable"
-			@confirm="confirmSearch"> </luyj-tree-search>
+			<luyj-tree-search v-if="searchIf" :backgroundColor="searchBackgroundColor"
+				:inputBackgroundColor="searchInputBackgroundColor" :radius="searchRadius" :iconColor="searchIconColor"
+				:placeholder="searchPlaceholder" :placeholderStyle="searchPlaceholderStyle" :maxlength="searchMaxlength"
+				:clearable="searchClearable" @confirm="confirmSearch"></luyj-tree-search>
 			<!-- 面包屑导航 -->
-			<view class="title">
-				<scroll-view scroll-x style="width: 100%;white-space: nowrap;" :scroll-left="scrollLeft">
-					<view v-for="(item,index) in tree_stack" class="inline-item" :key="index">
-						<view class="inline-item" v-if="index==0" @click="backTree(item,-1)">
-							<text v-if="index==tree_stack.length-1&&!isre" class="none">全部</text>
-							<text v-else class="active">全部</text>
-						</view>
-						<view v-if="index==0&&isre" @click="backTree(item,-2)"
-							:class="[index==tree_stack.length-1&&isre]?'none inline-item':'active inline-item'">
-							<i class="iconfont icon-z043 iconclass" />
-							搜索结果
-						</view>
-						<view class="inline-item" @click="backTree(item,index)" v-if="index!=0">
-							<i v-if="index!=0" class="iconfont icon-z043 iconclass" />
-							<text v-if="index==tree_stack.length-1" class="none inline-item">
-								{{item[props.label]}}
-							</text>
-							<text v-else class="active">
-								{{item[props.label]}}
-							</text>
-						</view>
-					</view>
-				</scroll-view>
-			</view>
+			<luyj-tree-navigation :slabel="props.label" @inF="navigationInt" @clickItem="backTree">
+			</luyj-tree-navigation>
+			<!-- 面包屑导航 -->
 		</view>
 		<!-- 列表 -->
 		<view>
 			<view class="container-list">
-				<!-- <luyj-tree-item v-for="(item , index) in tree" :item="item" :key="index"></luyj-tree-item> -->
-				<view class="common" v-for="(item, index) in tree" @click="toChildren(item)" :key="index">
-					<label class="content">
-						<view class="checkbox" v-if="isCheck&&props.multiple" @click.stop="checkboxChange(item,index,item.bx,item.qx)">
-							<span v-if="(newCheckList.findIndex(e=>{return item.id==e.id}))>-1&&!item.qx">
-								<i v-if="item.bx&&props.multiple" class="iconfont icon-banxuanzhongshousuo1-shi icons"/>
-								<i v-else class="iconfont icon-xuanzhong txt icon-selected"/>
-							</span>
-							<i v-else-if="props.multiple&&item.qx" class="iconfont icon-xuanzhong txt icon-selected"/>
-							<i v-else-if="item.bx&&props.multiple" class="iconfont icon-banxuanzhongshousuo1-shi icons"/>
-							<i style="color: #b8b8b8;" v-else class="iconfont icon-weixuanzhong txt"/>
-						</view>
-						<view class="checkbox" v-if="isCheck&&!props.multiple&&props.nodes&&item.user" @click.stop="checkbox(item,index)">
-							<i v-if="newCheckList.length>0&&item.id == newCheckList[0].id" class="txt iconfont icon-selected"/>
-							<i style="color: #b8b8b8;" v-else class="txt iconfont icon-weixuanzhong1"/>
-						</view>
-						<view class="checkbox" v-if="isCheck&&!props.multiple&&!props.nodes" @click.stop="checkbox(item,index)">
-							<i v-if="newCheckList.length>0&&item.id == newCheckList[0].id" class="txt iconfont icon-selected"/>
-							<i style="color: #b8b8b8;" v-else class="txt iconfont icon-weixuanzhong1"/>
-						</view>
-						<view v-if="item.user" @click.stop="checkboxChange(item,index,item.bx,item.qx)">
-							<slot v-bind:item="item" >
-								{{ item.name }}
-							</slot>
-						</view>
-						<slot v-else v-bind:item="item" >
-							{{ item.name }}
+				<luyj-tree-item v-if="true" v-for="(item , index) in tree" :key="index" :item="item" :isCheck="isCheck"
+					:checkActiveColor="checkActiveColor" :checkNoneColor="checkNoneColor" :multiple="props.multiple" :checked="newCheckList.includes(item)"
+					 :nodes="props.nodes" :comparison="comparison" @clickItem="toChildren"
+					@change="checkbox($event , item , index)">
+					<template slot="body">
+						<slot v-bind:item="item" v-bind:slotObj="slotObj">
+							<view class="word">{{ item[props.label] }}</view>
 						</slot>
-						<view class="right"><i v-if="!item.user&&item.children.length>0" class="iconfont icon-z043"></i></view>
-					</label>
-				</view>
+					</template>
+				</luyj-tree-item>
 			</view>
 		</view>
 		<!-- 确定按钮 -->
@@ -91,17 +50,22 @@
 	 * @property {Boolean} searchPlaceholder 搜索框是否显示清除按钮
 	 * @property {Array}  trees 传入的树形结构，每个对象必须包含唯一的id值(默认值【】)
 	 * @property {Boolean} isCheck 是否开启选择操作（默认值false）
-	 * @property {Number} max 最大的level层数（默认值-1）
+	 * @property {Object} slotObj 传入插槽的参数（因为插槽进行了循环，不能直接引用页面的参数，需要传递） 
 	 * @property {Array} checkList 选中列表
 	 * @property {Boolean} parent 当子级全选时,是否选中父级数据(prop.checkStrictly为true时生效)(默认值false)
 	 * @property {Array} parentList 父级列表
+	 * @property {String} checkActiveColor 选中时单选框的颜色 (默认#00AAFF)
+	 * @property {String} checkNoneColor 未选中时单选框的颜色（默认#B8B8B8) 
 	 * @property {Object} props 参数配置。
+	 *  @property {String} id id列的属性名称 
 	 * 	@param {String}  label 指定选项标签为选项对象的某个属性值(默认值:name)
-	 *  @param {String} children   指定选项的子选项为选项对象的某个属性值(默认值：children)
+	 *  @param {String} children   指定选项的子选项为选项对象的某个属性名(默认值：children)
+	 *  @param {Boolean} hasChildren   是否包含下一级的属性名（默认user）
 	 *  @param {Boolean} multiple 值为true时为多选，为false时是单选(默认值true)
-	 *  @param {Boolean} checkStrictly 需要在多选模式下才传该值，checkStrictly为false时，可让父子节点取消关联，选择任意一级选项。为true时关联子级，可以全选(默认值为false)
+	 *  @param {Boolean} checkStrictly(废弃) 需要在多选模式下才传该值，checkStrictly为false时，可让父子节点取消关联，选择任意一级选项。为true时关联子级，可以全选(默认值为false)
 	 *  @param {Boolean} nodes  在单选模式下，nodes为false时，可以选择任意一级选项，nodes为true时，只能选择叶子节点(默认值为true) 
-	 * 
+	 * @return {Function} sendValue 选中item时操作。返回item的值
+	 * @return {Function} backTree	选中导航栏时，返回其他层
 	 */
 	export default {
 		name: "luyj-tree",
@@ -127,7 +91,7 @@
 				default: '#B8B8B8'
 			},
 			// 搜索框的圆角值，单位rpx
-			searchRadius :{
+			searchRadius: {
 				type: Number,
 				default: 40
 			},
@@ -138,18 +102,18 @@
 			},
 			// 搜索框的placeholder的样式
 			searchPlaceholderStyle: {
-				type : String,
-				default:''
+				type: String,
+				default: ''
 			},
 			// 搜索框最大输入长度 ,设置为 -1 的时候不限制最大长度
-			searchMaxlength :{
-				type:Number,
-				default:140
+			searchMaxlength: {
+				type: Number,
+				default: 140
 			},
 			// 搜索框是否显示清除按钮
-			searchClearable :{
+			searchClearable: {
 				type: Boolean,
-				default:true
+				default: true
 			},
 			// 传入的树形结构数据，每个对象必须包含唯一的id值
 			trees: {
@@ -165,12 +129,11 @@
 					return false
 				}
 			},
-			
-			// 最大level层数
-			max: {
-				type: Number,
-				default: () => {
-					return -1;
+			// 传入插槽的其他参数
+			slotObj: {
+				type: Object,
+				default :() =>{
+					return null;
 				}
 			},
 			// 选中列表
@@ -190,108 +153,216 @@
 				type: Array,
 				default: () => []
 			},
+			// 选中时单选框的颜色
+			checkActiveColor: {
+				type: String,
+				default: '#00AAFF'
+			},
+			// 未选中时单选框的颜色
+			checkNoneColor: {
+				type: String,
+				default: '#B8B8B8'
+			},
 			// 树的属性参数
 			props: {
 				type: Object,
 				default: () => {
 					return {
+						id: 'id',
 						label: 'name',
 						children: 'children',
+						hasChilren: 'user',
 						multiple: false,
 						checkStrictly: false, //不关联
+						nodes: false, // nodes为false时，可以选择任意一级选项；nodes为true时只能选择叶子节点
 					}
 				}
 			}
 		},
 		data() {
 			return {
-				isre: false,
+				// 导航条
+				setIsre: null, // 导航条 - 设置是否搜索中方法
+				setTreeStack: null, // 导航条 - 设置导航
+				concatTreeStack: null, // 导航条 - 拼接当前导航对象
+				clearTreeStack: null, // 导航条- 清空导航至
+				getTreeStack: null, // 导航条 - 获取导航至
 				tree: this.trees,
 				newNum: 0,
 				oldNum: 0,
 				allData: this.trees,
-				tree_stack: [1],
 				parent_data: this.parentList || [], //选择父辈
 				searchResult: [],
-				tochild: false,
 				newCheckList: this.checkList,
-				scrollLeft: 999,
-				nodePathArray: []
+				nodePathArray: [],
+				// item名称对照表
+				comparison: {
+					value: this.props.id ? this.props.id : 'id', // 选中值名称
+					label: this.props.label ? this.props.label : 'name', // 显示名称
+					hasChilren: this.props.hasChilren ? this.props.hasChilren : 'user', // 是否包含子集
+					children: this.props.children ? this.props.children : 'children', // 子集名称
+				}
+			}
+		},
+		watch: {
+			// 监听数据值的变化
+			trees: function(val, oldval) {
+				if (val != oldval) {
+					this.tree = val;
+					this.allData = val;
+				}
+			},
+			// 树的属性对照参数
+			props: {
+				handler: function(val) {
+					this.comparison.value = this.props.id ? this.props.id : 'id';
+					this.comparison.label = this.props.label ? this.props.label : 'name';
+					this.comparison.hasChilren = this.props.hasChilren ? this.props.hasChilren : 'user';
+					this.comparison.children = this.props.children ? this.props.children : [];
+				},
+				deep: true
 			}
 		},
 		// 实例被挂载后调用
 		mounted() {
-			if(this.props.multiple&&this.props.checkStrictly){
-				if(this.newCheckList.length!=0){
-					 this.checkAllChoose();
-					 return
-				}
-				for(let i = 0; i<this.tree.length;i++){
-					this.$set(this.tree[i],'bx',0)
-					this.$set(this.tree[i],'qx',0)
-				}
-			}
-			if(!this.props.multiple&&this.newCheckList.length>0) {
-				this.getNodeRoute(this.allData,this.newCheckList[0].id)
+			// 关联子级的验证，暂时不使用
+			// if (this.props.multiple && this.props.checkStrictly) {
+			// 	if (this.newCheckList.length != 0) {
+			// 		this.checkAllChoose();
+			// 		return;
+			// 	}
+			// 	for (let i = 0; i < this.tree.length; i++) {
+			// 		this.$set(this.tree[i], 'bx', 0)
+			// 		this.$set(this.tree[i], 'qx', 0)
+			// 	}
+			// }
+			// 初始化选中项
+			if (!this.props.multiple && this.newCheckList.length > 0) {
+				this.getNodeRoute(this.allData, this.newCheckList[0][this.props.id])
 				let arr = this.nodePathArray.reverse()
-				if(arr.length == 0)return
-				this.tree_stack = this.tree_stack.concat(arr);
-				this.tree = this.tree_stack[this.tree_stack.length-1].children;
+				if (arr.length == 0) {
+					return;
+				}
+				this.concatTreeStack(arr);
+				var tree_Stack = this.getTreeStack();
+				this.tree = Boolean(tree_stack[tree_stack.length - 1][props.children]) ? tree_stack[tree_stack.length - 1][
+					props.children
+				] : [];
 			}
 		},
 		methods: {
-			//多选
-			async checkboxChange(item, index, bx, qx) {
+			// =========================================== 初始化方法 ===================================================================
+			/** 初始化导航条的方法
+			 * @param {Object} e
+			 */
+			navigationInt: function(e) {
+				this.setIsre = e.setIsre;
+				this.concatTreeStack = e.concatTreeStack;
+				this.pushTreeStack = e.pushTreeStack;
+				this.clearTreeStack = e.clearTreeStack;
+				this.getTreeStack = e.getTreeStack;
+			},
+			// =========================================== 监听事件 =====================================================================
+			/** 选中当前的值
+			 * @param {Object} e
+			 * @param {Object} item 当前项
+			 * @param {Object} index 低昂去索引
+			 */
+			checkbox(e, item, index) {
+				var func = this.props.multiple ?  this.checkboxChange : this.radioChange;
+				func(e,item ,index);			// 执行选择操作
+			},
+			/**单选
+			 * @param {Object} e 点击事件
+			 * @param {Object} item 当前项的值
+			 * @param {Object} index 索引
+			 */
+			radioChange :function( e,item ,index){
 				var that = this;
-				if (!this.props.multiple) return;
-				let findIdex = that.newCheckList.findIndex(e => {
-					return item.id == e.id
-				});
-				if (findIdex > -1) { //反选
-					if (that.props.checkStrictly) { //关联子级
-						if (item.user) { //用户
-							that.newCheckList.splice(findIdex, 1)
-						} else { //非用户，取消所有下一级
-							that.getIdBydelete(item.children)
-						}
-					} else {
-						that.newCheckList.splice(findIdex, 1)
-					}
-				} else { //选中
-					if (!item.user && that.props.checkStrictly) { //选中下一级
-						if (qx || bx) { //取消下级
-							await that.getIdBydelete(item.children);
-							item.qx = 0;
-							item.bx = 0;
-						} else {
-							item.qx = 1;
-							item.bx = 0;
-							await that.chooseChild(item.children, item.id);
-						}
-						that.$emit('sendValue', that.newCheckList);
-						that.$forceUpdate()
-						return
-					}
-					// if(item.user&&this.props.checkStrictly) this.getNodeRoute(this.allData,item.id);
-					that.newCheckList.push({
-						...item
-					});
+				if(e.detail.value){
+					// 选中当前对象
+					that.newCheckList = [];
+					that.newCheckList.push(that.tree[index]);
+				}else{
+					// 移除其他对象
+					var nIndex = that.newCheckList.indexOf(item);
+					that.newCheckList.splice(nIndex , 1);
 				}
-				that.$emit('sendValue', that.newCheckList)
+				that.$emit('sendValue', that.newCheckList);
+			},
+			/**异步检查复选框值的改变
+			 * @param {Object} item
+			 * @param {Object} index
+			 * @param {Object} bx
+			 * @param {Object} qx
+			 */
+			 async checkboxChange (e,item, index, bx, qx) {
+				let that = this;
+				let findIdex = that.newCheckList.indexOf(item);
+				if(e.detail.value){
+					// 点击选中
+					if(findIdex == -1){
+						that.newCheckList.push(that.tree[index]);
+					}
+				}else{
+					// 点击不选
+					that.newCheckList.splice(findIdex , 1);
+				}
+				that.$emit('sendValue', that.newCheckList);
+				
+				// if (findIdex > -1) { //反选
+				// 	if (that.props.checkStrictly) { //关联子级
+				// 		if (item[props.hasChilren]) { //用户
+				// 			that.newCheckList.splice(findIdex, 1)
+				// 		} else { //非用户，取消所有下一级
+				// 			if (Boolean(item[props.children])) {
+				// 				that.getIdBydelete(item[props.children]);
+				// 			}
+				// 		}
+				// 	} else {
+				// 		that.newCheckList.splice(findIdex, 1)
+				// 	}
+				// } else { //选中
+				// 	if (!item[this.props.hasChilren] && that.props.checkStrictly) { //选中下一级
+				// 		if (qx || bx) { //取消下级
+				// 			if (Boolean(item[props.children])) {
+				// 				await that.getIdBydelete(item[props.children]);
+				// 			}
+				// 			item.qx = 0;
+				// 			item.bx = 0;
+				// 		} else {
+				// 			item.qx = 1;
+				// 			item.bx = 0;
+				// 			if (Boolean(item[props.children])) {
+				// 				await that.chooseChild(item[props.children], item[this.props.id]);
+				// 			}
+				// 		}
+				// 		that.$emit('sendValue', that.newCheckList);
+				// 		// that.$forceUpdate()
+				// 		return;
+				// 	}
+				// 	// if(item[this.props.hasChilren]&&this.props.checkStrictly) this.getNodeRoute(this.allData,item[this.props.id]);
+				// 	that.newCheckList.push({
+				// 		...item
+				// 	});
+				// }
+				// that.$emit('sendValue', that.newCheckList)
 			},
 			// 取消下一级的选中
 			getIdBydelete(arr) {
 				arr.forEach(e => {
-					if (e.user) {
+					if (e[this.props.hasChilren]) {
 						for (var i = 0; i < this.newCheckList.length; i++) {
-							if (e.id == this.newCheckList[i].id) {
+							if (e[this.props.id] == this.newCheckList[i][this.props.id]) {
 								this.newCheckList.splice(i, 1)
 								break;
 							}
 						}
 					}
-					if (!e.user) {
-						this.getIdBydelete(e.children)
+					if (!e[this.props.hasChilren]) {
+						if (Boolean(item[props.children])) {
+							this.getIdBydelete(e[props.children]);
+						}
 					}
 				})
 			},
@@ -300,14 +371,16 @@
 				let that = this;
 				for (var i = 0, len = arr.length; i < len; i++) {
 					let item = arr[i];
-					if (item.user) {
+					if (item[that.props.hasChilren]) {
 						that.newCheckList.push({
 							...item,
 							tree_stackId: pid
 						})
 					}
-					if (!item.user) {
-						this.chooseChild(item.children, item.id)
+					if (!item[that.props.hasChilren]) {
+						if (Boolean(item[props.children])) {
+							this.chooseChild(item[props.children], item[this.props.id])
+						}
 					}
 				}
 			},
@@ -315,83 +388,94 @@
 			// (tree为目标树，targetId为目标节点id) 
 			getNodeRoute(tree, targetId) {
 				for (let index = 0; index < tree.length; index++) {
-					if (tree[index].children) {
-						let endRecursiveLoop = this.getNodeRoute(tree[index].children, targetId)
-						if (endRecursiveLoop) {
-							this.nodePathArray.push(tree[index])
-							return true
+					if (Boolean(item[props.children])) {
+						if (tree[index][props.children]) {
+							let endRecursiveLoop = this.getNodeRoute(tree[index][props.children], targetId)
+							if (endRecursiveLoop) {
+								this.nodePathArray.push(tree[index])
+								return true
+							}
 						}
 					}
-					if (tree[index].id === targetId) {
-						return true
+					if (tree[index][this.props.id] === targetId) {
+						return true;
 					}
 				}
 			},
 
-			//单选
-			checkbox(item, index) {
-				var that = this;
-				that.newCheckList = []
-				that.newCheckList.push(that.tree[index])
-				that.$emit('sendValue', that.newCheckList)
-			},
-			//到下一级
-			toChildren(item) {
-				console.log(this.tree_stack)
-				if (item.user) return
-				var that = this;
-				this.tochild = true;
-				let children = that.props.children;
-				if (!item.user && item[children].length > 0) {
-					that.tree = item[children];
-					if (that.tree_stack[0].id == item.id) {} else {
-						that.tree_stack.push(item);
-					}
+			
+			
+			/**跳转到子级
+			 * @param {Object} item 选中的项
+			 * @param {type} realHasChildren 是否包含子级
+			 */
+			toChildren(item, realHasChildren) {
+				// 不包含子级,不执行任何操作
+				if (!realHasChildren) {
+					return;
 				}
-				this.$nextTick(() => {
-					this.scrollLeft += 200;
-				})
-				if (this.props.checkStrictly) this.checkAllChoose();
-				this.$forceUpdate()
+
+				// 点击跳转下一级
+				let id = this.props.id;
+				let hasChildren = this.props.hasChilren; // 是否包含子级名称
+				let children = this.props.children; // 子级名称
+
+				// 将当前item加入到导航列表
+				if (!item[hasChildren] && item[children].length > 0) {
+					this.tree = item[children];
+					this.pushTreeStack(item); // 添加导航
+				}
+				// 关联数据
+				if (this.props.checkStrictly) {
+					this.checkAllChoose();
+				}
 			},
-			/** 搜索时方法
+			/** 搜索提交方法
 			 * @param {Object} e
 			 */
 			confirmSearch(e) {
 				var val = e.detail.value;
-				this.searchResult = []
-				this.search(this.allData, val)
-				this.isre = true
-				this.tree_stack.splice(1, 6666)
+				this.searchResult = [];
+				// 查找
 				uni.showLoading({
 					title: '正在查找'
-				})
-				setTimeout(() => {
-					this.tree = this.searchResult
-					uni.hideLoading()
-				}, 300)
+				});
+				this.search(this.allData, val);
+				// 返回搜索结果
+				uni.hideLoading();
+				this.setIsre(true); // 设置导航条为搜索状态
+				this.clearTreeStack(); // 清空导航条
+				this.tree = this.searchResult;
 			},
+			/**搜索方法
+			 * @param {Object} data 搜索数据
+			 * @param {Object} keyword 搜索关键字
+			 */
 			search(data, keyword) {
 				var that = this
 				let children = that.props.children
 				for (var i = 0, len = data.length; i < len; i++) {
-					if (data[i].name.indexOf(keyword) >= 0) {
-						that.searchResult.push(data[i])
+					if (data[i][this.props.label].indexOf(keyword) >= 0) {
+						that.searchResult.push(data[i]);
 					}
-					if (!data[i].user && data[i][children].length > 0) {
-						that.search(data[i][children], keyword)
+					if (Boolean(data[i][children])) {
+						if (!data[i][that.props.hasChilren] && data[i][children].length > 0) {
+							that.search(data[i][children], keyword)
+						}
 					}
 				}
 			},
-
+			/**
+			 * 检查所有的选项
+			 */
 			checkAllChoose() {
 				let o = false,
 					t = true;
 				this.tree.forEach((e, i) => {
-					if (!e.user) {
+					if (!e[this.props.hasChilren]) {
 						e.qx = o;
 						e.bx = o;
-						let num2 = this.computAllNumber(e.children);
+						let num2 = this.computAllNumber(e[props.children]);
 						// console.log(this.newNum,this.oldNum)
 						if (this.newNum != 0 && this.oldNum != 0) {
 							if (this.newNum == this.oldNum) {
@@ -406,26 +490,28 @@
 							this.$set(this.tree[i], 'bx', o);
 							this.$set(this.tree[i], 'qx', o);
 						}
-						this.$forceUpdate()
+						// this.$forceUpdate()
 						this.newNum = 0
 						this.oldNum = 0
 					}
 				})
 			},
 
+			// 选中所选值
 			computAllNumber(arr) {
 				for (let j = 0; j < arr.length; j++) {
 					var e = arr[j];
-					if (arr[j].user) {
+					if (arr[j][that.props.hasChilren]) {
 						this.newNum++;
 					}
 					this.checkSum(e.id)
-					if (!e.user) {
-						this.computAllNumber(e.children)
+					if (!e[thata.props.hasChilren]) {
+						this.computAllNumber(e[props.children])
 					}
 				}
 			},
 
+			// 选中事件累计
 			checkSum(id) {
 				for (let i = 0; i < this.newCheckList.length; i++) {
 					if (id == this.newCheckList[i].id) {
@@ -435,35 +521,31 @@
 				}
 			},
 
-			//返回其它层
+			/** 返回到其他树层
+			 * @param {Object} item 当前item值
+			 * @param {Object} index 返回到其他索引
+			 */
 			backTree(item, index) {
-				let that = this,
-					max = 66666;
+				this.$emit("backTree", item, index);
+				let that = this;
 				if (index == -1) {
-					that.tree = that.allData
-					that.tree_stack.splice(1, max)
-					that.isre = false
-					that.$refs.sea.clears()
+					// 全部
+					that.tree = that.allData;
 				} else if (index == -2) {
-					that.tree = that.searchResult
-					that.tree_stack.splice(1, max)
+					// 搜索
+					that.tree = that.searchResult; // 搜索结果
 				} else {
-					if (that.tree_stack.length - index > 2) {
-						that.tree_stack.forEach((item, i) => {
-							if (i > index) {
-								that.tree_stack.splice(i, max)
-							}
-						})
-					} else if (index == that.tree_stack.length - 1) {
-
-					} else {
-						that.tree_stack.splice(that.tree_stack.length - 1, 1)
-					}
+					// 其他层级
 					that.tree = item[that.props.children]
 				}
-				if (this.props.checkStrictly) this.checkAllChoose();
-				this.$forceUpdate()
+				// 关联数据
+				if (this.props.checkStrictly) {
+					this.checkAllChoose();
+				}
 			},
+			/**
+			 * 点击确认按钮执行事件
+			 */
 			backConfirm() {
 				this.$emit('sendValue', this.newCheckList, 'back')
 			}

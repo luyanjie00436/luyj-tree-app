@@ -1,0 +1,28 @@
+// 导航栏标题
+.title {
+	height: 90rpx;
+	padding: 0 32rpx;
+	line-height: 90rpx;
+	font-size: 30rpx;
+	background-color: #f5f5f5;
+	color: #606064;
+	// 导航栏图标样式
+	.iconclass {
+		display: inline-block;
+		margin: 0 12rpx;
+		color: #D0D4DB;
+		font-size: 28rpx;
+	}
+}
+// 导航栏项样式
+.inline-item {
+	display: inline-block
+}
+// 导航栏项-启用状态
+.active {
+	color: #4297ED !important;
+}
+// 导航栏项-无状态
+.none {
+	color: #666666;
+}

@@ -28,3 +28,26 @@
 		
 	}
 }
+// 复选框
+.checkbox {
+		position: relative;
+		height: 36rpx;
+		margin-left: 10rpx;
+		margin-right: 0px;
+		width: 36rpx;
+		.color {
+			color: #00aaff;
+			background-color: #00aaff;
+		}
+		.txt {
+			font-size: 44rpx;
+			line-height: 36rpx;
+			width: 100%;
+			height: 100%;
+			display: flex;
+		}
+	}
+	
+.checkBorder {
+	border: 1px solid #ecdee4;
+}

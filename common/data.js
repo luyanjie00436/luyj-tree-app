@@ -1,18 +1,3 @@
-// let dataList = [{
-// 	id: "128334455556667681",
-// 	name: "学生2104",
-// 	user: false,
-// 	children: [
-// 		{
-// 			id: "128334455556667682",
-// 			name: "学生2104",
-// 			user: true,
-// 			children:[]
-// 		}
-// 	],
-// 	checked: false
-// }];
-// export default dataList
 let dataList = [{
 		checked: false,
 		children: [{
@@ -315,7 +300,6 @@ let dataList = [{
 										checked: false,
 										user: true
 									},
-
 									{
 										children: [],
 										id: "12817783759074555555555655681",
@@ -1210,4 +1194,4 @@ let dataList = [{
 		}]
 	},
 ];
-export default dataList
+export default dataList;
