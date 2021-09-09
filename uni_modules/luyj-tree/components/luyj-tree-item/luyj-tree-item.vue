@@ -8,7 +8,7 @@
 			</view>
 			<!-- 复选框 -->
 			<!-- 单选框 -->
-			<view class="checkbox" v-if="isRadio" @click.stop="clickBox">
+			<view class="checkbox" v-else-if ="isRadio" @click.stop="clickBox">
 				<i v-if="curChecked" :style="{'color' :checkActiveColor}"  class="txt iconfont icon-selected"/>
 				<i v-else :style="{'color': checkNoneColor}"  class="txt iconfont icon-weixuanzhong1"/>
 			</view>
@@ -30,8 +30,8 @@
 	 * @property {Object} item 单项的值（默认null） 
 	 * @property {Boolean} isCheck 判断是否可选 (默认false)
 	 * @property {Boolean} 判断是否是否多选（默认false， isCheck为true时有效）。
-	 * @property {String} checkActiveColor 选中时单选框的颜色 (默认#00AAFF)
-	 * @property {String} checkNoneColor 未选中时单选框的颜色（默认#B8B8B8) 
+	 * @property {String} checkActiveColor 选中状态下单选框/复选框的颜色 (默认#00AAFF)
+	 * @property {String} checkNoneColor 未选中状态下单选框/复选框的颜色（默认#B8B8B8) 
 	 * @property {Object} comparison 属性名称对照表 
 	 * 	@param {String} value 选中值对应列名称(默认value)
 	 *  @param {String}  label 显示值对应列名称（默认label）
@@ -70,12 +70,12 @@
 				type: false,
 				default:true
 			},
-			// 选中时单选框的颜色
+			// 选中状态下单选框/复选框的颜色
 			checkActiveColor : {
 				type:String,
 				default:'#00AAFF'
 			},
-			// 未选中时单选框的颜色
+			// 未选中状态下单选框的颜色
 			checkNoneColor : {
 				type:String,
 				default:'#B8B8B8'
@@ -144,10 +144,6 @@
 			checked : function(val){
 				this.curChecked = val;
 			}
-		},
-		created:function(){
-			// console.log("comparison" , this.comparison , this.comparison.hasChilren , this.s);
-			// console.log("user=>" , this.sHasChildren , this.item[this.sHasChildren]);
 		},
 		methods:{
 			/** 点击当前项的执行方法

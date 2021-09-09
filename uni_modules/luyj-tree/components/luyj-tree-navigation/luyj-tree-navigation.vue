@@ -1,14 +1,14 @@
 <template>
 	<view class="title">
-		<scroll-view ref="sea" scroll-x style="width: 100%;white-space: nowrap;" :scroll-left="scrollLeft">
+		<scroll-view ref="sea" scroll-x style="width: 100%;white-space: nowrap;">
 			<!-- 全部 -->
-			<view class="inline-item" @click="clickItem(item,-1)">
+			<view class="inline-item" @click="clickItem(null,-1)">
 				<text v-if="!isre && treeStack.length == 0" class="none">全部</text>
 				<text v-else class="active">全部</text>
 			</view>
 			<!-- 全部 -->
 			<!-- 搜索结果 -->
-			<view v-if="isre" @click="clickItem(item,-2)"
+			<view v-if="isre" @click="clickItem(null,-2)"
 				:class="activeSearch?'active inline-item':' none inline-item'">
 				<i class="iconfont icon-z043 iconclass" />
 				搜索结果
@@ -48,6 +48,7 @@
 	 * 	@param {Function}  pushTreeStack 为导航树添加项
 	 * 	@param {Function}  clearTreeStack 清空导航树
 	 */
+	// scrollLeft : 暂时
 	export default {
 		name: "luyj-tree-navigation",
 		props: {
@@ -78,6 +79,7 @@
 			});
 			var obj = {
 				setIsre: this.setIsre,
+				getIsre : this.getIsre,
 				setTreeStack: this.setTreeStack,
 				concatTreeStack : this.concatTreeStack,
 				pushTreeStack: this.pushTreeStack,
@@ -88,11 +90,17 @@
 		},
 		methods: {
 			// ================================== 初始化时导出方法（用于外部调用内部结果） =========================================================
-			/** 设置isre值
+			/** 设置isre值(是否搜索)
 			 * @param {Boolean} isre 设置是否搜索
 			 */
 			setIsre: function(isre) {
 				this.isre = isre;
+			},
+			/**
+			 * 获取isr值（获取是否搜索中）
+			 */
+			getIsre: function(){
+				return this.isre;
 			},
 			/** 设置导航树
 			 * @param {Array} treeStack 导航树

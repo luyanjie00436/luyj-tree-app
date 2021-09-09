@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<luyj-tree  v-slot:default="{item}" :checkList="checkList"  :max="max" :props="prop" @sendValue="confirm"  :parent="true" :isCheck="isCheck" :trees="tree">
+		<luyj-tree  v-slot:default="{item}" :checkList="checkList"   :props="prop" @change="change" @sendValue="confirm"  :parent="true" :isCheck="isCheck" :trees="tree">
 			<!-- 内容插槽 -->
 			<view>
 				<view class="content-item">
@@ -36,7 +36,7 @@
 				bprop: {
 					label: 'name',
 					children: 'children',
-					multiple: true,
+					multiple: false,
 					checkStrictly: true
 				},
 				cprop: { //单选模式(任意一项)
@@ -110,16 +110,19 @@
 				},3000);
 			},
 			// =================================== 监听事件  =====================================================================
-			/** 获取选中的值
+			/**选项改变时执行方法
 			 * @param {Object} val
-			 * @param {Object} back
 			 */
-			confirm(val, back) {
-				// this.checkList = val;
-				if (back) {
-					this.backConfirm(val)
-					return
-				}
+			change : function(val){
+				console.log('选项改变时执行方法',val);
+			},
+			/** 点击确认按钮
+			 * @param {Object} val
+			 */
+			confirm(val) {
+				console.log('点击确认按钮=>' , val);
+				this.checkList = val;
+				this.backConfirm(val);
 				this.backList = val;
 			},
 			/** 向上一页返回参数
@@ -127,19 +130,21 @@
 			 */
 			backConfirm(val) {
 				var pages = getCurrentPages();
-				var currPage = pages[pages.length - 1]; //当前页面
-				var prevPage = pages[pages.length - 2]; //上一个页面
-				// #ifdef H5
-				prevPage.$vm.query = val //h5写法
-				// #endif
-				let check = val;
-				//#ifdef MP-WEIXIN||MP-QQ
-				prevPage.setData({
-					query: check,
-				}) //小程序写法
-				// #endif
-
-				uni.navigateBack();
+				if(pages.length > 2){
+					var currPage = pages[pages.length - 1]; //当前页面
+					var prevPage = pages[pages.length - 2]; //上一个页面
+					// #ifdef H5
+					prevPage.$vm.query = val //h5写法
+					// #endif
+					let check = val;
+					//#ifdef MP-WEIXIN||MP-QQ
+					prevPage.setData({
+						query: check,
+					}) //小程序写法
+					// #endif
+					
+					uni.navigateBack();
+				}
 			}
 		}
 	}

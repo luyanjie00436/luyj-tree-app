@@ -14,8 +14,8 @@
 		</view>
 		<!-- 列表 -->
 		<view>
-			<view class="container-list">
-				<luyj-tree-item v-if="true" v-for="(item , index) in tree" :key="index" :item="item" :isCheck="isCheck"
+			<view class="container-list" :style="{'padding-bottom' : isCheck ? '160rpx' : 0 , 'padding-top' :searchIf ? '200rpx' :'90rpx' }">
+				<luyj-tree-item v-for="(item , index) in tree" :key="index" :item="item" :isCheck="isCheck"
 					:checkActiveColor="checkActiveColor" :checkNoneColor="checkNoneColor" :multiple="props.multiple" :checked="newCheckList.includes(item)"
 					 :nodes="props.nodes" :comparison="comparison" @clickItem="toChildren"
 					@change="checkbox($event , item , index)">
@@ -47,7 +47,7 @@
 	 * @property {String} searchPlaceholderStyle 搜索框的placehoder的样式
 	 * @property {Number} searchMaxlength 搜索框的最大输入长度 ,设置为 -1 的时候不限制最大长度
 	 * @property {String} searchIconColor 搜索框的图标颜色（默认#B8B8B8）
-	 * @property {Boolean} searchPlaceholder 搜索框是否显示清除按钮
+	 * @property {Boolean} searchClearable 搜索框是否显示清除按钮
 	 * @property {Array}  trees 传入的树形结构，每个对象必须包含唯一的id值(默认值【】)
 	 * @property {Boolean} isCheck 是否开启选择操作（默认值false）
 	 * @property {Object} slotObj 传入插槽的参数（因为插槽进行了循环，不能直接引用页面的参数，需要传递） 
@@ -64,8 +64,14 @@
 	 *  @param {Boolean} multiple 值为true时为多选，为false时是单选(默认值true)
 	 *  @param {Boolean} checkStrictly(废弃) 需要在多选模式下才传该值，checkStrictly为false时，可让父子节点取消关联，选择任意一级选项。为true时关联子级，可以全选(默认值为false)
 	 *  @param {Boolean} nodes  在单选模式下，nodes为false时，可以选择任意一级选项，nodes为true时，只能选择叶子节点(默认值为true) 
-	 * @return {Function} sendValue 选中item时操作。返回item的值
-	 * @return {Function} backTree	选中导航栏时，返回其他层
+	 * @property {Boolean} stepReload 是否“分页加载”数据
+	 * @property {Number} pageSize 分步加载生效时（当条数过大时，反应时间很长）
+	 * @return {Function} clickItem 点击导航栏事件
+	 * 	@value item 当前选中的item值
+	 *  @value 	realHasChildren 是否包含子级
+	 * @event {Function()} change 改变选择值时的方法
+	 * @event {Function()} sendValue 提交选择的方法
+	 * @event {Function()} backTree	选中导航栏时，返回其他层
 	 */
 	export default {
 		name: "luyj-tree",
@@ -177,17 +183,33 @@
 						nodes: false, // nodes为false时，可以选择任意一级选项；nodes为true时只能选择叶子节点
 					}
 				}
+			},
+			/**
+			 * 是否懒加载树的值
+			 */
+			stepReload : {
+				type:Boolean,
+				default:false
+			},
+			// 每次循环加载的item的数据量
+			pageSize : {
+				type : Number,
+				default:50
 			}
 		},
 		data() {
 			return {
 				// 导航条
 				setIsre: null, // 导航条 - 设置是否搜索中方法
+				getIsre : null,	// 获取是否搜索中
 				setTreeStack: null, // 导航条 - 设置导航
 				concatTreeStack: null, // 导航条 - 拼接当前导航对象
-				clearTreeStack: null, // 导航条- 清空导航至
-				getTreeStack: null, // 导航条 - 获取导航至
-				tree: this.trees,
+				clearTreeStack: null, // 导航条- 清空导航条
+				getTreeStack: null, // 导航条 - 获取导航条
+				
+				itemsLoading : false,	// item是否在循环渲染中
+				itemsStop : false,		// 是否终止其他渲染
+				tree: [],			// 默认数组
 				newNum: 0,
 				oldNum: 0,
 				allData: this.trees,
@@ -208,8 +230,39 @@
 			// 监听数据值的变化
 			trees: function(val, oldval) {
 				if (val != oldval) {
-					this.tree = val;
-					this.allData = val;
+					var tree_stack = this.getTreeStack();
+					this.allData = val;				// 重新加载所有树
+					// 重新加载当前树
+					if(!Array.isArray(tree_stack)){
+						this.loadTree(val);
+						return;
+					}
+					var length = tree_stack.length;
+					if( length === 0){
+						if(typeof(this.getIsre)  === "function"){
+							if(this.getIsre()){
+								return;
+							}
+						}
+						this.loadTree(val);
+					}else{
+						let tempArray = val;		// 存储当前值
+						let children = this.props.children;
+						for(var i = 0 ; i < length ; i ++){
+							var tempObject = tempArray.find(item=>{
+								return tree_stack[i].Value == item.Value;
+							});
+							if(Boolean(tempObject)){
+								tempArray = tempObject[children];
+							}else{
+								// 跳转到全部
+								break;
+							}
+							if(i == length -1){
+								this.loadTree(tempArray);
+							}
+						}
+					}
 				}
 			},
 			// 树的属性对照参数
@@ -222,6 +275,9 @@
 				},
 				deep: true
 			}
+		},
+		created:function(){
+			this.loadTree(this.trees);
 		},
 		// 实例被挂载后调用
 		mounted() {
@@ -244,10 +300,11 @@
 					return;
 				}
 				this.concatTreeStack(arr);
-				var tree_Stack = this.getTreeStack();
-				this.tree = Boolean(tree_stack[tree_stack.length - 1][props.children]) ? tree_stack[tree_stack.length - 1][
+				var tree_stack = this.getTreeStack();
+				var data = Boolean(tree_stack[tree_stack.length - 1][props.children]) ? tree_stack[tree_stack.length - 1][
 					props.children
 				] : [];
+				this.loadTree(data);
 			}
 		},
 		methods: {
@@ -257,6 +314,7 @@
 			 */
 			navigationInt: function(e) {
 				this.setIsre = e.setIsre;
+				this.getIsre = e.getIsre;
 				this.concatTreeStack = e.concatTreeStack;
 				this.pushTreeStack = e.pushTreeStack;
 				this.clearTreeStack = e.clearTreeStack;
@@ -288,7 +346,7 @@
 					var nIndex = that.newCheckList.indexOf(item);
 					that.newCheckList.splice(nIndex , 1);
 				}
-				that.$emit('sendValue', that.newCheckList);
+				that.$emit('change', that.newCheckList);
 			},
 			/**异步检查复选框值的改变
 			 * @param {Object} item
@@ -308,7 +366,7 @@
 					// 点击不选
 					that.newCheckList.splice(findIdex , 1);
 				}
-				that.$emit('sendValue', that.newCheckList);
+				that.$emit('change', that.newCheckList);
 				
 				// if (findIdex > -1) { //反选
 				// 	if (that.props.checkStrictly) { //关联子级
@@ -337,7 +395,7 @@
 				// 				await that.chooseChild(item[props.children], item[this.props.id]);
 				// 			}
 				// 		}
-				// 		that.$emit('sendValue', that.newCheckList);
+				// 		that.$emit('change', that.newCheckList);
 				// 		// that.$forceUpdate()
 				// 		return;
 				// 	}
@@ -346,7 +404,7 @@
 				// 		...item
 				// 	});
 				// }
-				// that.$emit('sendValue', that.newCheckList)
+				// that.$emit('change', that.newCheckList)
 			},
 			// 取消下一级的选中
 			getIdBydelete(arr) {
@@ -402,19 +460,17 @@
 					}
 				}
 			},
-
-			
 			
 			/**跳转到子级
 			 * @param {Object} item 选中的项
-			 * @param {type} realHasChildren 是否包含子级
+			 * @param {Boolean} realHasChildren 是否包含子级
 			 */
 			toChildren(item, realHasChildren) {
+				this.$emit("clickItem" , item , realHasChildren);		// 点击导航栏事件
 				// 不包含子级,不执行任何操作
 				if (!realHasChildren) {
 					return;
 				}
-
 				// 点击跳转下一级
 				let id = this.props.id;
 				let hasChildren = this.props.hasChilren; // 是否包含子级名称
@@ -422,13 +478,13 @@
 
 				// 将当前item加入到导航列表
 				if (!item[hasChildren] && item[children].length > 0) {
-					this.tree = item[children];
+					this.loadTree(item[children]);
 					this.pushTreeStack(item); // 添加导航
 				}
-				// 关联数据
-				if (this.props.checkStrictly) {
-					this.checkAllChoose();
-				}
+				// 关联数据 - 暂时不使用
+				// if (this.props.checkStrictly) {
+				// 	this.checkAllChoose();
+				// }
 			},
 			/** 搜索提交方法
 			 * @param {Object} e
@@ -445,24 +501,30 @@
 				uni.hideLoading();
 				this.setIsre(true); // 设置导航条为搜索状态
 				this.clearTreeStack(); // 清空导航条
-				this.tree = this.searchResult;
+				this.loadTree(this.searchResult);
 			},
 			/**搜索方法
 			 * @param {Object} data 搜索数据
 			 * @param {Object} keyword 搜索关键字
 			 */
 			search(data, keyword) {
-				var that = this
-				let children = that.props.children
+				var that = this;
+				let children = that.props.children;
 				for (var i = 0, len = data.length; i < len; i++) {
-					if (data[i][this.props.label].indexOf(keyword) >= 0) {
-						that.searchResult.push(data[i]);
-					}
-					if (Boolean(data[i][children])) {
-						if (!data[i][that.props.hasChilren] && data[i][children].length > 0) {
-							that.search(data[i][children], keyword)
+					// try-catch(try-catch) - 没有label列，跳过继续执行
+					try{
+						if (data[i][that.props.label].indexOf(keyword) >= 0) {
+							that.searchResult.push(data[i]);
 						}
+						if (Boolean(data[i][children])) {
+							if (!data[i][that.props.hasChilren] && data[i][children].length > 0) {
+								that.search(data[i][children], keyword);
+							}
+						}
+					}catch(e){
+						console.warn(e);
 					}
+					
 				}
 			},
 			/**
@@ -530,25 +592,75 @@
 				let that = this;
 				if (index == -1) {
 					// 全部
-					that.tree = that.allData;
+					that.loadTree(that.allData);
 				} else if (index == -2) {
 					// 搜索
-					that.tree = that.searchResult; // 搜索结果
+					that.loadTree(that.searchResult);		// 搜索结果
 				} else {
 					// 其他层级
-					that.tree = item[that.props.children]
+					that.loadTree(item[that.props.children]);	// tree的其他层级
 				}
 				// 关联数据
-				if (this.props.checkStrictly) {
-					this.checkAllChoose();
-				}
+				// if (this.props.checkStrictly) {
+				// 	this.checkAllChoose();
+				// }
 			},
 			/**
 			 * 点击确认按钮执行事件
 			 */
 			backConfirm() {
 				this.$emit('sendValue', this.newCheckList, 'back')
-			}
+			},
+			// ======================================== 公共方法 ===============================================================
+			/**加载Tree值
+			 * @param {Array} datas 待复制的数组
+			 * @param {Number} start 起始位置
+			 * @description 加载tree值。当数据量大时，子项加载时间很长。可以多次渲染加载
+			 */
+			loadTree : function(datas , start = 0 ){
+				let that = this;
+				if(!this.stepReload){
+					// 不进行多次渲染加载
+					that.tree = datas;
+				}else{
+					// datas为null, 不进行渲染
+					if(!Array.isArray(datas)){
+						that.tree = datas;
+						return;
+					}else if(datas.length === 0){
+						that.tree = datas;
+						return;
+					}
+					// 进行多次渲染加载
+					if(start === 0){
+						// 终止其他渲染
+						if(that.itemsLoading){
+							that.itemsStop = true;		//终止其他Item渲染
+						}
+						// 首次加载提醒
+						uni.showLoading();
+						that.tree = [];
+						that.itemsLoading = true;
+					}
+					var length =  datas.length ;
+					var end = Math.min(start + that.pageSize , length);
+					var tempArray  = datas.slice(start , end);
+					that.tree = that.tree.concat(tempArray);
+					that.$nextTick(function(){
+						if(start == 0){
+							uni.hideLoading();
+							that.itemsStop = false;
+						}
+						if(end < length && !that.itemsStop){
+							that.loadTree(datas, end);
+						}else{
+							that.itemsLoading = false;
+						}
+					});
+				}
+			},
+			// =================================================================================================================
+			
 		}
 	}
 </script>

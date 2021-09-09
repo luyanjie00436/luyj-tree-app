@@ -18,8 +18,8 @@
 			width: 500rpx;
 			word-break: break-all;
 		}
-		// 默认右键显示内容
-		.right {
+		// 默认右键显示内容 /deep/
+		 .right {
 			position: absolute;
 			right: 30rpx;
 			color: #babdc3;
@@ -28,8 +28,8 @@
 		
 	}
 }
-// 复选框
-.checkbox {
+// 复选框 /deep/
+ .checkbox {
 		position: relative;
 		height: 36rpx;
 		margin-left: 10rpx;
